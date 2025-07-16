@@ -8,6 +8,8 @@ export const serverUrl = 'http://localhost:8000';
 import {useSelector} from 'react-redux';
 import useGetCurrentUser from './hooks/getCurrentUser';
 import useGetSuggestedUsers from './hooks/getSuggestedUsers';
+import Profile from './pages/profile';
+import EditProfilePage from './pages/editprofile';
 
 const App = () => {
    useGetCurrentUser();
@@ -31,7 +33,14 @@ const App = () => {
             path="/"
             element={userData ? <Home /> : <Navigate to="/signin" />}
          />
-         {/* Add more routes as needed */}
+         <Route
+            path="/profile/:userName"
+            element={userData ? <Profile /> : <Navigate to="/signin" />}
+         />
+         <Route
+            path="/editprofile"
+            element={userData ? <EditProfilePage /> : <Navigate to="/signin" />}
+         />
       </Routes>
    );
 };

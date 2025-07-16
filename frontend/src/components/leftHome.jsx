@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import axios from 'axios';
 import {serverUrl} from '../App';
 import {setUserData} from '../redux/userSlice';
+import {useNavigate} from 'react-router-dom';
 
 const LeftHome = () => {
    const {userData} = useSelector((state) => state.user);
@@ -22,6 +23,8 @@ const LeftHome = () => {
       }
    };
 
+   const navigate = useNavigate();
+
    return (
       <div className="w-[25%] hidden lg:block min-h-[100vh] bg-gradient-to-b from-black to-gray-900 border-r-1 border-gray-800 ">
          <div className="w-full h-[100px] flex items-center justify-between px-3">
@@ -34,7 +37,11 @@ const LeftHome = () => {
          </div>
          <div className="flex items-center gap-2 justify-between px-3 border-b-1 border-gray-800 pb-3">
             <div className="flex items-center gap-2">
-               <div className="w-[50px] h-[50px] border-2 border-black rounded-full overflow-hidden cursor-pointer">
+               <div
+                  onClick={() => {
+                     navigate('/profile/' + userData.userName);
+                  }}
+                  className="w-[50px] h-[50px] border-2 border-black rounded-full overflow-hidden cursor-pointer">
                   <img
                      className="w-full h-full object-cover"
                      src={
@@ -67,7 +74,11 @@ const LeftHome = () => {
                         key={user._id}
                         className="flex items-center justify-between gap-2 border-b-1 border-gray-800 py-3">
                         <div className="flex items-center gap-2">
-                           <div className="w-[45px] h-[45px] border-2 border-black rounded-full overflow-hidden cursor-pointer">
+                           <div
+                              onClick={() => {
+                                 navigate('/profile/' + user.userName);
+                              }}
+                              className="w-[45px] h-[45px] border-2 border-black rounded-full overflow-hidden cursor-pointer">
                               <img
                                  className="w-full h-full object-cover"
                                  src={

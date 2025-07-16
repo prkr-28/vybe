@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+.root {
+   overflow-x: hidden;
+}
+
 /* Hide scrollbar cross-browser but keep scroll functionality */
 
 /* Chrome, Edge, Safari */
