@@ -1,0 +1,8 @@
+@font-face {
+   font-family: 'myfont';
+   src: url('/Rillosta.otf') format('truetype');
+}
+
+.logo {
+   font-family: 'myfont', sans-serif;
+}

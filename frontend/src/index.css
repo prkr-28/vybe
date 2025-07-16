@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+/* Hide scrollbar cross-browser but keep scroll functionality */
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+   display: none;
+}
+
+/* Firefox */
+* {
+   scrollbar-width: none;
+}
