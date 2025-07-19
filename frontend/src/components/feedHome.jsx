@@ -2,8 +2,11 @@ import React from 'react';
 import {FaRegHeart} from 'react-icons/fa6';
 import StoryCard from './storyCard';
 import Nav from './nav';
+import {useSelector} from 'react-redux';
+import Post from './post';
 
 const FeedHome = () => {
+   const {postData} = useSelector((state) => state.post);
    return (
       <div className="lg:w-[50%] w-full bg-gradient-to-b from-black to-gray-900 min-h-[100vh] lg:h-[100vh] relative lg:overflow-y-auto">
          <div className="w-full h-[80px] flex items-center justify-between px-[20px] lg:hidden">
@@ -40,7 +43,10 @@ const FeedHome = () => {
          </div>
 
          {/* posts section */}
-         <div className="w-full min-h-[100vh] flex flex-col items-center gap-4 p-[10px] pt-[40px] bg-white rounded-t-2xl relative pb-[120px]">
+         <div className="w-full min-h-[100vh] flex flex-col items-center gap-4 p-[10px] pt-[40px] bg-white rounded-t-4xl relative pb-[120px]">
+            {postData.map((post) => (
+               <Post key={post._id} postData={post} />
+            ))}
             <Nav />
          </div>
       </div>

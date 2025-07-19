@@ -2,12 +2,14 @@ import React, {useState} from 'react';
 import axios from 'axios';
 import {serverUrl} from '../App';
 import {useDispatch, useSelector} from 'react-redux';
-import {setUserData} from '../redux/userSlice';
+import {setProfileData, setUserData} from '../redux/userSlice';
 import {useNavigate} from 'react-router-dom';
 import {IoMdArrowRoundBack} from 'react-icons/io';
+import {ClipLoader} from 'react-spinners';
 
 const EditProfilePage = () => {
    const {userData} = useSelector((state) => state.user);
+   const [loading, setLoading] = useState(false);
    const [name, setName] = useState(userData.name || '');
    const [userName, setUserName] = useState(userData.userName || '');
    const [profession, setProfession] = useState(userData.profession || '');
@@ -15,7 +17,8 @@ const EditProfilePage = () => {
    const [gender, setGender] = useState(userData.gender || '');
    const [profileImage, setProfileImage] = useState('');
    const [previewImage, setPreviewImage] = useState(
-      userData.profileImage || ''
+      userData.profileImage ||
+         'https://i.pinimg.com/474x/e6/e4/df/e6e4df26ba752161b9fc6a17321fa286.jpg'
    );
    const dispatch = useDispatch();
    const navigate = useNavigate();
@@ -31,6 +34,7 @@ const EditProfilePage = () => {
    };
 
    const handleSubmit = async (e) => {
+      setLoading(true);
       e.preventDefault();
       try {
          const formData = new FormData();
@@ -43,7 +47,7 @@ const EditProfilePage = () => {
             formData.append('profileImage', profileImage);
          }
 
-         const response = await axios.put(
+         const response = await axios.post(
             `${serverUrl}/api/user/updateProfile`,
             formData,
             {
@@ -53,10 +57,14 @@ const EditProfilePage = () => {
                },
             }
          );
+         dispatch(setProfileData(response.data));
          dispatch(setUserData(response.data));
          navigate('/profile/' + userName);
       } catch (error) {
-         console.error('Error updating profile:', error);
+         alert('Failed to update profile. Please try again later.');
+         console.error(error.response ? error.response.data : error.message);
+      } finally {
+         setLoading(false);
       }
    };
 
@@ -90,7 +98,7 @@ const EditProfilePage = () => {
                Change Your Profile Picture
                <input
                   type="file"
-                  accept="image/jpeg, image/png"
+                  accept="image/*"
                   onChange={handleImageChange}
                   className="hidden"
                />
@@ -149,7 +157,11 @@ const EditProfilePage = () => {
                <button
                   type="submit"
                   className="bg-white text-black font-semibold py-3 rounded-xl mt-4 cursor-pointer">
-                  Save Profile
+                  {loading ? (
+                     <ClipLoader color="#000000" size={24} />
+                  ) : (
+                     'Save Profile'
+                  )}
                </button>
             </form>
          </div>

@@ -5,6 +5,7 @@ import {serverUrl} from '../App';
 import {useDispatch, useSelector} from 'react-redux';
 import {setProfileData, setUserData} from '../redux/userSlice';
 import {IoIosArrowBack} from 'react-icons/io';
+import Nav from '../components/nav';
 
 const Profile = () => {
    const {userName} = useParams();
@@ -53,7 +54,7 @@ const Profile = () => {
             </div>
             <button
                onClick={handleLogOut}
-               className="text-xs md:text-sm font-semibold px-2 py-2 md:px-4 bg-white hover:bg-gray-100 rounded-2xl cursor-pointer">
+               className="text-xs md:text-sm text-center font-semibold px-[10px] py-[6px] min-w-[60px] bg-white hover:bg-gray-100 rounded-2xl cursor-pointer">
                Log Out
             </button>
          </div>
@@ -76,7 +77,7 @@ const Profile = () => {
                <div className="font-semibold text-xl md:text-2xl text-white">
                   {profileData?.name}
                </div>
-               <div className="text-base md:text-lg text-gray-300">
+               <div className="text-sm md:text-base text-gray-400">
                   {profileData?.profession || 'newUser'}
                </div>
                <div className="text-sm md:text-base text-gray-400">
@@ -136,7 +137,9 @@ const Profile = () => {
          </div>
 
          <div className="w-full min-h-[100vh] flex justify-around">
-            <div className="w-full max-w-[900px] flex flex-col items-center rounded-t-4xl bg-white relative gap-[20px] pt-[30px]"></div>
+            <div className="w-full max-w-[900px] flex flex-col items-center rounded-t-4xl bg-white relative gap-[20px] pt-[30px]">
+               <Nav />
+            </div>
          </div>
       </div>
    );

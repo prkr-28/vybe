@@ -12,7 +12,7 @@ const userRouter = express.Router();
 userRouter.get('/current', isAuthenticated, getCurrentUser);
 userRouter.get('/suggestedUsers', isAuthenticated, getSuggestedUsers);
 userRouter.post(
-   '/editProfile',
+   '/updateProfile',
    isAuthenticated,
    upload.single('profileImage'),
    updateUserProfile

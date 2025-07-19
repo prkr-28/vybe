@@ -10,10 +10,13 @@ import useGetCurrentUser from './hooks/getCurrentUser';
 import useGetSuggestedUsers from './hooks/getSuggestedUsers';
 import Profile from './pages/profile';
 import EditProfilePage from './pages/editprofile';
+import Upload from './pages/upload';
+import useGetAllPosts from './hooks/useGetAllPosts';
 
 const App = () => {
    useGetCurrentUser();
    useGetSuggestedUsers();
+   useGetAllPosts();
    const {userData} = useSelector((state) => state.user);
    return (
       <Routes>
@@ -40,6 +43,10 @@ const App = () => {
          <Route
             path="/editprofile"
             element={userData ? <EditProfilePage /> : <Navigate to="/signin" />}
+         />
+         <Route
+            path="/upload"
+            element={userData ? <Upload /> : <Navigate to="/signin" />}
          />
       </Routes>
    );

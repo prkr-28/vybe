@@ -61,10 +61,12 @@ export const updateUserProfile = async (req, res) => {
 
       user.name = name;
       user.userName = userName;
-      user.profileImage = profileImage;
+      if (profileImage) {
+         user.profileImage = profileImage;
+      }
       user.bio = bio;
       user.profession = profession;
-      user.gender = gender;
+      user.gender = gender || undefined;
 
       await user.save();
       res.status(200).json(user);

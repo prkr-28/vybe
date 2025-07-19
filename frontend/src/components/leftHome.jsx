@@ -98,7 +98,7 @@ const LeftHome = () => {
                            </div>
                         </div>
 
-                        <button className="text-sm font-semibold px-[10px] w-[100px] py-[5px] h-[40px] bg-white hover:bg-gray-100 rounded-2xl cursor-pointer">
+                        <button className="text-xs md:text-sm font-semibold px-[10px] py-[6px] min-w-[100px] bg-white hover:bg-gray-100 rounded-2xl cursor-pointer">
                            Follow
                         </button>
                      </div>
