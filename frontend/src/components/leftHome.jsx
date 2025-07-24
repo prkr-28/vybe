@@ -26,7 +26,7 @@ const LeftHome = () => {
    const navigate = useNavigate();
 
    return (
-      <div className="w-[25%] hidden lg:block min-h-[100vh] bg-gradient-to-b from-black to-gray-900 border-r-1 border-gray-800 ">
+      <div className="w-[25%] hidden lg:block min-h-[100vh] bg-black border-r-1 border-gray-800 ">
          <div className="w-full h-[100px] flex items-center justify-between px-3">
             <div className="logo font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent text-2xl">
                VYBE

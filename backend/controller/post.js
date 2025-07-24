@@ -43,7 +43,11 @@ export const getAllPosts = async (req, res) => {
    try {
       const posts = await Post.find({})
          .populate('author', 'userName name profileImage')
-         .sort({createdAt: -1});
+         .sort({createdAt: -1})
+         .populate('comments.author', 'userName name profileImage');
+      if (!posts) {
+         return res.status(404).json({message: 'No posts found'});
+      }
       res.status(200).json(posts);
    } catch (error) {
       res.status(500).json({message: 'Internal server error'});
@@ -122,8 +126,10 @@ export const savedPosts = async (req, res) => {
          user.saved.push(postId);
       }
       await user.save();
-      user.populate('saved');
-      res.status(200).json(user);
+      await user.populate('saved');
+      const userObj = user.toObject();
+      userObj.saved = userObj.saved.map((post) => post._id);
+      res.status(200).json(userObj);
    } catch (error) {
       res.status(500).json({
          message: 'Error fetching saved posts',

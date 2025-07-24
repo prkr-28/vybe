@@ -93,3 +93,47 @@ export const getUserProfileById = async (req, res) => {
       });
    }
 };
+
+export const FollowUser = async (req, res) => {
+   try {
+      const {userId} = req.params;
+      const currentUserId = req.userId;
+
+      if (userId === currentUserId) {
+         return res.status(400).json({message: 'Cannot follow yourself'});
+      }
+
+      const userToFollow = await User.findById(userId);
+      if (!userToFollow) {
+         return res.status(404).json({message: 'User not found'});
+      }
+
+      const currentUser = await User.findById(currentUserId);
+      if (!currentUser) {
+         return res.status(404).json({message: 'Current user not found'});
+      }
+
+      if (currentUser.following.includes(userId)) {
+         // logic to unfollow..
+         currentUser.following.pull(userId);
+         userToFollow.followers.pull(currentUserId);
+      }
+
+      currentUser.following.push(userId);
+      userToFollow.followers.push(currentUserId);
+
+      await currentUser.save();
+      await userToFollow.save();
+
+      res.status(200).json({
+         message: 'Successfully followed the user',
+         following: currentUser.following,
+         followers: userToFollow.followers,
+      });
+   } catch (error) {
+      res.status(500).json({
+         message: 'Error following user',
+         error: error.message,
+      });
+   }
+};

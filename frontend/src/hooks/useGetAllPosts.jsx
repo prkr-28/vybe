@@ -1,11 +1,12 @@
 import React, {useEffect} from 'react';
 import axios from 'axios';
 import {serverUrl} from '../App';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {setPostData} from '../redux/postSlice';
 
 const useGetAllPosts = () => {
    const dispatch = useDispatch();
+   const {userData} = useSelector((state) => state.user);
    useEffect(() => {
       const fetchAllPosts = async () => {
          try {
@@ -20,6 +21,6 @@ const useGetAllPosts = () => {
       };
 
       fetchAllPosts();
-   }, []);
+   }, [dispatch, userData]);
 };
 export default useGetAllPosts;
