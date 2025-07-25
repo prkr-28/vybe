@@ -2,11 +2,9 @@ import React from 'react';
 import {FaRegHeart} from 'react-icons/fa6';
 import StoryCard from './storyCard';
 import Nav from './nav';
-import {useSelector} from 'react-redux';
 import Post from './post';
 
-const FeedHome = () => {
-   const {postData} = useSelector((state) => state.post);
+const FeedHome = ({postData}) => {
    return (
       <div className="lg:w-[50%] w-full bg-black min-h-[100vh] lg:h-[100vh] relative lg:overflow-y-auto">
          <div className="w-full h-[80px] flex items-center justify-between px-[20px] lg:hidden">

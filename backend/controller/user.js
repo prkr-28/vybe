@@ -4,11 +4,24 @@ import User from '../models/user.js';
 export const getCurrentUser = async (req, res) => {
    try {
       const userId = req.userId;
-      const user = await User.findById(userId);
+      const user = await User.findById(userId)
+         .populate(
+            'posts loops saved saved.author',
+            'userName name profileImage'
+         ) // populate only necessary fields
+         .populate('followers', '_id') // populate only _id
+         .populate('following', '_id'); // populate only _id
+
       if (!user) {
          return res.status(404).json({message: 'User not found'});
       }
-      res.status(200).json(user);
+
+      // Convert to plain JS object to modify
+      const userObj = user.toObject();
+      userObj.following = userObj.following.map((u) => u._id.toString());
+      userObj.followers = userObj.followers.map((u) => u._id.toString());
+
+      res.status(200).json(userObj);
    } catch (error) {
       res.status(500).json({
          message: 'Error fetching current user',
@@ -81,7 +94,9 @@ export const updateUserProfile = async (req, res) => {
 export const getUserProfileById = async (req, res) => {
    try {
       const {userName} = req.params;
-      const user = await User.findOne({userName}).select('-password -email');
+      const user = await User.findOne({userName}).populate(
+         'posts loops followers following'
+      );
       if (!user) {
          return res.status(404).json({message: 'User not found'});
       }
@@ -117,8 +132,14 @@ export const FollowUser = async (req, res) => {
          // logic to unfollow..
          currentUser.following.pull(userId);
          userToFollow.followers.pull(currentUserId);
+         await currentUser.save();
+         await userToFollow.save();
+         return res.status(200).json({
+            message: 'Successfully unfollowed the user',
+            following: currentUser.following,
+            followers: userToFollow.followers,
+         });
       }
-
       currentUser.following.push(userId);
       userToFollow.followers.push(currentUserId);
 

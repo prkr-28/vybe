@@ -6,6 +6,7 @@ import axios from 'axios';
 import {serverUrl} from '../App';
 import {setUserData} from '../redux/userSlice';
 import {useNavigate} from 'react-router-dom';
+import FollowUser from './followButton';
 
 const LeftHome = () => {
    const {userData} = useSelector((state) => state.user);
@@ -98,9 +99,7 @@ const LeftHome = () => {
                            </div>
                         </div>
 
-                        <button className="text-xs md:text-sm font-semibold px-[10px] py-[6px] min-w-[100px] bg-white hover:bg-gray-100 rounded-2xl cursor-pointer">
-                           Follow
-                        </button>
+                        <FollowUser tailwind={"text-xs md:text-sm font-semibold px-[10px] py-[6px] min-w-[100px] bg-white hover:bg-gray-100 rounded-2xl cursor-pointer"} targetUserId={user._id} />
                      </div>
                   ))
                ) : (

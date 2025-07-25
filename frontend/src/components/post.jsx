@@ -11,8 +11,11 @@ import {serverUrl} from '../App';
 import {useDispatch} from 'react-redux';
 import {setPostData} from '../redux/postSlice';
 import {setUserData} from '../redux/userSlice';
+import FollowUser from './followButton';
+import {useNavigate} from 'react-router-dom';
 
-const Post = ({post}) => {
+const Post = ({post, onProfile}) => {
+   const navigate = useNavigate();
    const {userData} = useSelector((state) => state.user);
    const [commentModelOpen, setCommentModelOpen] = useState(false);
    const {postData} = useSelector((state) => state.post);
@@ -20,7 +23,9 @@ const Post = ({post}) => {
    const [Comment, setComment] = useState('');
 
    const handleCommentClick = () => {
-      setCommentModelOpen(!commentModelOpen);
+      {
+         onProfile ? null : setCommentModelOpen(!commentModelOpen);
+      }
    };
 
    const handleLike = async () => {
@@ -81,10 +86,7 @@ const Post = ({post}) => {
          <div className="flex items-center justify-between px-6 py-5 border-b border-cyan-100">
             <div className="flex items-center gap-4">
                <div
-                  onClick={() => {
-                     window.location.href =
-                        '/profile/' + post?.author?.userName;
-                  }}
+                  onClick={() => navigate(`/profile/${post.author.userName}`)}
                   className="w-14 h-14 rounded-full overflow-hidden border-2 border-cyan-400 shadow cursor-pointer transition-transform hover:scale-105">
                   <img
                      className="w-full h-full object-cover"
@@ -105,9 +107,12 @@ const Post = ({post}) => {
                </div>
             </div>
             {post?.author?.userName !== userData?.userName && (
-               <button className="bg-white hover:opacity-90 text-black font-medium px-3 md:px-5 py-2 rounded-full shadow transition">
-                  Follow
-               </button>
+               <FollowUser
+                  targetUserId={post.author._id}
+                  tailwind={
+                     'bg-white hover:opacity-90 text-black font-medium px-3 md:px-5 py-2 rounded-full shadow transition cursor-pointer'
+                  }
+               />
             )}
          </div>
 

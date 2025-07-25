@@ -51,6 +51,7 @@ const Upload = () => {
             {withCredentials: true}
          );
          dispatch(setPostData([...postData, res.data]));
+         //refresh the posts page
          navigate('/');
       } catch (error) {
          setLoading(false);

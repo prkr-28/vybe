@@ -40,7 +40,7 @@ const Nav = () => {
                }`}
             />
          </div>
-         <div className="cursor-pointer">
+         <div onClick={() => navigate('/loop')} className="cursor-pointer">
             <RiVideoOnAiLine
                className={`text-2xl hover:text-blue-600 ${
                   location.pathname === '/video'

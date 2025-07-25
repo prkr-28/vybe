@@ -1,6 +1,7 @@
 import express from 'express';
 import {isAuthenticated} from '../middlewares/isauth.js';
 import {
+   FollowUser,
    getCurrentUser,
    getSuggestedUsers,
    getUserProfileById,
@@ -18,5 +19,6 @@ userRouter.post(
    updateUserProfile
 );
 userRouter.get('/getProfile/:userName', isAuthenticated, getUserProfileById);
+userRouter.post('/follow/:userId', isAuthenticated, FollowUser);
 
 export default userRouter;
