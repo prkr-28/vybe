@@ -6,28 +6,34 @@ import LoopCard from '../components/loopCard';
 
 const Loop = () => {
    const navigate = useNavigate();
-   const {userData} = useSelector((state) => state.user);
+   const {loopData} = useSelector((state) => state.loop);
+
    return (
-      <div className="bg-black w-screen min-h-screen overflow-hidden flex justify-center items-center p-4">
+      <div className="bg-black w-screen h-screen overflow-hidden relative">
          {/* Header */}
-         <div className="w-full flex items-center mb-6 gap-2 fixed top-6 left-5">
+         <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
             <IoMdArrowRoundBack
                onClick={() => navigate('/')}
-               className="text-white text-xl hover:text-blue-400 cursor-pointer"
+               className="text-red-500 text-2xl hover:text-blue-400 cursor-pointer"
             />
          </div>
 
-         <LoopCard
-            loop={{
-               title: 'Loop Title',
-               caption: 'This is a sample caption for the loop.',
-               audioUrl: '',
-               liked: false,
-            }}
-            onLike={(liked) => console.log('Liked:', liked)}
-            onMute={(muted) => console.log('Muted:', muted)}
-            onPlayPause={(playing) => console.log('Playing:', playing)}
-         />
+         {/* Content */}
+         <div className="w-full h-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide">
+            {loopData.length > 0 ? (
+               loopData.map((loop, idx) => (
+                  <div
+                     key={idx}
+                     className="h-screen snap-start flex justify-center items-center">
+                     <LoopCard loop={loop} />
+                  </div>
+               ))
+            ) : (
+               <div className="text-white text-lg flex justify-center items-center h-full">
+                  No loops available at the moment.
+               </div>
+            )}
+         </div>
       </div>
    );
 };

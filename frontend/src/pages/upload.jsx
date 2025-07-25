@@ -136,6 +136,9 @@ const Upload = () => {
                   className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg h-44 sm:h-52 bg-gradient-to-br from-[#0e1316] to-[#1a2230] border-2 border-gray-800 flex flex-col items-center justify-center gap-3 rounded-2xl mt-10 cursor-pointer text-white shadow-lg hover:shadow-cyan-700 transition-shadow duration-300">
                   <input
                      type="file"
+                     accept={
+                        uploadType === 'Loop' ? 'video/*' : 'image/*, video/*'
+                     }
                      className="hidden"
                      ref={MediaInput}
                      onChange={handleMedia}
@@ -145,7 +148,9 @@ const Upload = () => {
                      Click to Upload {uploadType}
                   </p>
                   <span className="text-xs text-gray-400 text-center">
-                     Supported: Images & Videos
+                     {uploadType === 'Loop'
+                        ? 'Upload a video for your loop'
+                        : 'Upload an image or video for your post or story'}
                   </span>
                </div>
             ) : (
