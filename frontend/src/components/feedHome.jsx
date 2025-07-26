@@ -41,7 +41,7 @@ const FeedHome = ({postData}) => {
          </div>
 
          {/* posts section */}
-         <div className="w-full min-h-[100vh] flex flex-col items-center gap-4 p-[10px] pt-[40px] bg-black rounded-t-4xl relative pb-[120px]">
+         <div className="w-full min-h-[100vh] flex flex-col items-center gap-4 p-[10px] pt-[20px] bg-black rounded-t-4xl relative pb-[120px]">
             {postData?.map((post) => (
                <Post key={post._id} post={post} />
             ))}

@@ -1,30 +1,27 @@
-import {FaRegHeart} from 'react-icons/fa';
-import {FaHeart} from 'react-icons/fa6';
+import React, {useEffect, useRef, useState} from 'react';
+import {FaRegHeart, FaHeart, FaRegBookmark, FaBookmark} from 'react-icons/fa';
 import {MdOutlineComment} from 'react-icons/md';
-import {useSelector} from 'react-redux';
-import {FaBookmark} from 'react-icons/fa6';
-import {FaRegBookmark} from 'react-icons/fa6';
-import React from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import {useState} from 'react';
 import {serverUrl} from '../App';
-import {useDispatch} from 'react-redux';
 import {setPostData} from '../redux/postSlice';
 import {setUserData} from '../redux/userSlice';
 import FollowUser from './followButton';
-import {useNavigate} from 'react-router-dom';
 
 const Post = ({post, onProfile}) => {
    const navigate = useNavigate();
    const {userData} = useSelector((state) => state.user);
-   const [commentModelOpen, setCommentModelOpen] = useState(false);
    const {postData} = useSelector((state) => state.post);
    const dispatch = useDispatch();
-   const [Comment, setComment] = useState('');
+
+   const [commentModelOpen, setCommentModelOpen] = useState(false);
+   const [comment, setComment] = useState('');
+   const videoRef = useRef();
 
    const handleCommentClick = () => {
-      {
-         onProfile ? null : setCommentModelOpen(!commentModelOpen);
+      if (!onProfile) {
+         setCommentModelOpen(!commentModelOpen);
       }
    };
 
@@ -36,8 +33,8 @@ const Post = ({post, onProfile}) => {
             {withCredentials: true}
          );
          const updatedPost = res.data;
-         const updatedPosts = postData.map((post) =>
-            post._id === updatedPost._id ? updatedPost : post
+         const updatedPosts = postData.map((p) =>
+            p._id === updatedPost._id ? updatedPost : p
          );
          dispatch(setPostData(updatedPosts));
       } catch (error) {
@@ -50,17 +47,17 @@ const Post = ({post, onProfile}) => {
       try {
          const res = await axios.post(
             `${serverUrl}/api/post/comment/${post._id}`,
-            {message: Comment},
+            {message: comment},
             {withCredentials: true}
          );
          const updatedPost = res.data;
-         const updatedPosts = postData.map((post) =>
-            post._id === updatedPost._id ? updatedPost : post
+         const updatedPosts = postData.map((p) =>
+            p._id === updatedPost._id ? updatedPost : p
          );
          dispatch(setPostData(updatedPosts));
          setComment('');
       } catch (error) {
-         console.error('Error commenting on post:', error);
+         console.error('Error commenting:', error);
          alert('Failed to comment on post');
       }
    };
@@ -73,12 +70,38 @@ const Post = ({post, onProfile}) => {
             {withCredentials: true}
          );
          dispatch(setUserData(res.data));
-         console.log(res.data);
       } catch (error) {
          console.error('Error saving post:', error);
          alert('Failed to save post');
       }
    };
+
+   // Reset video on re-mount or revisit
+   useEffect(() => {
+      const video = videoRef.current;
+      if (video && post.mediaType === 'video') {
+         video.currentTime = 0;
+         video.pause();
+
+         const observer = new IntersectionObserver(
+            ([entry]) => {
+               if (entry.isIntersecting) {
+                  video.currentTime = 0;
+                  video.play().catch(() => {});
+               } else {
+                  video.pause();
+               }
+            },
+            {threshold: 0.6}
+         );
+
+         observer.observe(video);
+
+         return () => {
+            observer.unobserve(video);
+         };
+      }
+   }, [post._id]);
 
    return (
       <div className="w-full max-w-2xl mx-auto bg-black rounded-3xl shadow-lg overflow-hidden border border-cyan-200">
@@ -109,9 +132,7 @@ const Post = ({post, onProfile}) => {
             {post?.author?.userName !== userData?.userName && (
                <FollowUser
                   targetUserId={post.author._id}
-                  tailwind={
-                     'bg-white hover:opacity-90 text-black font-medium px-3 md:px-5 py-2 rounded-full shadow transition cursor-pointer'
-                  }
+                  tailwind="bg-white hover:opacity-90 text-black font-medium px-3 md:px-5 py-2 rounded-full shadow transition cursor-pointer"
                />
             )}
          </div>
@@ -127,9 +148,12 @@ const Post = ({post, onProfile}) => {
                />
             ) : (
                <video
+                  ref={videoRef}
                   className="w-full max-h-[400px] object-cover transition-shadow shadow-md"
                   src={post?.media}
-                  controls
+                  muted={false}
+                  autoPlay={false}
+                  controls={true}
                   style={{aspectRatio: '16/9'}}
                />
             )}
@@ -179,15 +203,21 @@ const Post = ({post, onProfile}) => {
             </div>
          </div>
 
-         {/* Comments Section */}
+         {/* Comments */}
          {commentModelOpen && (
             <div className="px-6 py-4 border-t border-cyan-100 bg-black">
                <h3 className="text-cyan-400 font-semibold mb-4">Comments</h3>
-               <div className="space-y-4">
+               <div className="space-y-4 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
                   {post?.comments?.length > 0 ? (
                      post.comments.map((comment, idx) => (
                         <div key={idx} className="flex items-start gap-3">
-                           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-cyan-400 shadow">
+                           <div
+                              onClick={() =>
+                                 navigate(
+                                    `/profile/${comment.author?.userName}`
+                                 )
+                              }
+                              className="w-10 h-10 rounded-full overflow-hidden border-2 border-cyan-400 shadow cursor-pointer">
                               <img
                                  className="w-full h-full object-cover"
                                  src={
@@ -210,20 +240,20 @@ const Post = ({post, onProfile}) => {
                   ) : (
                      <p className="text-gray-400">No comments yet.</p>
                   )}
+               </div>
 
-                  <div>
-                     <textarea
-                        value={Comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        className="w-full p-2 bg-transparent text-white rounded-lg border border-cyan-200 focus:outline-none focus:ring-2 focus:ring-gray-900"
-                        placeholder="Add a comment..."
-                        rows="2"></textarea>
-                     <button
-                        onClick={handleSendComment}
-                        className="mt-2 bg-white hover:opacity-90 text-black font-medium px-3 md:px-5 py-2 rounded-full shadow transition">
-                        Post Comment
-                     </button>
-                  </div>
+               <div className="mt-4">
+                  <textarea
+                     value={comment}
+                     onChange={(e) => setComment(e.target.value)}
+                     className="w-full p-2 bg-transparent text-white rounded-lg border border-cyan-200 focus:outline-none focus:ring-2 focus:ring-gray-900"
+                     placeholder="Add a comment..."
+                     rows="2"></textarea>
+                  <button
+                     onClick={handleSendComment}
+                     className="mt-2 bg-white hover:opacity-90 text-black font-medium px-3 md:px-5 py-2 rounded-full shadow transition">
+                     Post Comment
+                  </button>
                </div>
             </div>
          )}
