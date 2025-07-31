@@ -11,6 +11,7 @@ import {serverUrl} from '../App';
 import {useDispatch} from 'react-redux';
 import {setMessages} from '../redux/messageSlice';
 
+
 const MessageArea = () => {
    const {selectedUser, Messages} = useSelector((state) => state.message);
    const navigate = useNavigate();
@@ -21,6 +22,7 @@ const MessageArea = () => {
    const dispatch = useDispatch();
    const {userData} = useSelector((state) => state.user);
    const messagesEndRef = useRef(null);
+   const {socket} = useSelector((state) => state.socket);
 
 
    const handleImage = (e) => {
@@ -69,6 +71,19 @@ const MessageArea = () => {
       getAllMessages();
    }, [selectedUser, Messages.length]);
 
+
+   useEffect(() => {
+      socket?.on('newMessage', (message) => {
+         if (message.receiver === userData._id || message.sender === userData._id) {
+            dispatch(setMessages([...Messages, message]));
+         }
+      });
+
+      return () => {
+         socket.off('newMessage');
+      };
+   },[Messages,setMessages]);
+
    const scrollToBottom = () => {
    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 };
@@ -78,7 +93,7 @@ const MessageArea = () => {
 
    return (
       <div className="w-full min-h-screen bg-black relative">
-         <div className="flex items-center gap-[15px] px-[20px] py-[10px] fixed top-0 z-[100] bg-black w-full">
+         <div className="flex items-center gap-[15px] px-[20px] py-[10px] fixed top-0 z-[100] bg-black w-full border-b border-gray-800">
             <IoMdArrowRoundBack
                className="text-white text-2xl hover:text-blue-800 cursor-pointer"
                onClick={() => navigate(-1)}

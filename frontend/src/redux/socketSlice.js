@@ -1,16 +1,20 @@
-import {createSlice} from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const socketSlice = createSlice({
-   name: 'socket',
-   initialState: {
-      socket: null,
-   },
-   reducers: {
-      setSocket: (state, action) => {
-         state.socket = action.payload;
-      }
-   },
+  name: "socket",
+  initialState: {
+    socket: null,
+    onlineUsers: [],
+  },
+  reducers: {
+    setSocket: (state, action) => {
+      state.socket = action.payload;
+    },
+    setOnlineUsers: (state, action) => {
+      state.onlineUsers = action.payload;
+    },
+  },
 });
 
-export const { setSocket } = socketSlice.actions;
+export const { setSocket, setOnlineUsers } = socketSlice.actions;
 export default socketSlice.reducer;
