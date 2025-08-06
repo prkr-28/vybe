@@ -21,6 +21,9 @@ import Message from "./pages/message";
 import MessageArea from "./pages/messageArea";
 import { io } from "socket.io-client";
 import { setOnlineUsers, setSocket } from "./redux/socketSlice";
+import Searchpage from "./pages/searchpage";
+import useGetAllNotifications from "./hooks/getAllNotifications";
+import Notifications from "./pages/notifications";
 
 const App = () => {
   useGetCurrentUser();
@@ -29,6 +32,7 @@ const App = () => {
   useGetAllLoops();
   useGetAllStories();
   useGetMyStory();
+  useGetAllNotifications();
 
   const { userData } = useSelector((state) => state.user);
   const { socket } = useSelector((state) => state.socket);
@@ -108,6 +112,14 @@ const App = () => {
       <Route
         path="/messageArea"
         element={userData ? <MessageArea /> : <Navigate to="/signin" />}
+      />
+      <Route
+        path="/search"
+        element={userData ? <Searchpage /> : <Navigate to="/signin" />}
+      />
+      <Route
+        path="/notifications"
+        element={userData ? <Notifications /> : <Navigate to="/signin" />}
       />
     </Routes>
   );

@@ -11,6 +11,7 @@ import FollowUser from "./followButton";
 const LeftHome = () => {
   const { userData } = useSelector((state) => state.user);
   const { suggestedUsers } = useSelector((state) => state.user);
+  const { notifications } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleLogOut = async () => {
@@ -32,8 +33,14 @@ const LeftHome = () => {
         <div className="logo font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent text-2xl">
           VYBE
         </div>
-        <div>
+        <div onClick={() => navigate("/notifications")} className="relative">
           <FaRegHeart className="text-white text-2xl cursor-pointer" />
+          {notifications.length > 0 &&
+            notifications.some((noti) => !noti.isRead) && (
+              <span className="absolute top-[-8px] right-[-5px] bg-red-500 text-white text-xs rounded-full px-1">
+                {notifications.filter((noti) => !noti.read).length}
+              </span>
+            )}
         </div>
       </div>
       <div className="flex items-center gap-2 justify-between px-3 border-b-1 border-gray-800 pb-3">
@@ -42,7 +49,7 @@ const LeftHome = () => {
             onClick={() => {
               navigate("/profile/" + userData.userName);
             }}
-            className="w-[50px] h-[50px] border-2 border-black rounded-full overflow-hidden cursor-pointer"
+            className="w-[50px] h-[50px] border-2 border-cyan-400 rounded-full overflow-hidden hover:scale-105 transition-all duration-300 cursor-pointer"
           >
             <img
               className="w-full h-full object-cover"

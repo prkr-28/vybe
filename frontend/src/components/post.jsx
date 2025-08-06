@@ -10,6 +10,8 @@ import {setUserData} from '../redux/userSlice';
 import FollowUser from './followButton';
 
 const Post = ({post, onProfile}) => {
+   const commentsEndRef = useRef(null);
+
    const navigate = useNavigate();
    const {userData} = useSelector((state) => state.user);
    const {postData} = useSelector((state) => state.post);
@@ -18,12 +20,28 @@ const Post = ({post, onProfile}) => {
    const [commentModelOpen, setCommentModelOpen] = useState(false);
    const [comment, setComment] = useState('');
    const videoRef = useRef();
+   const {socket} = useSelector((state) => state.socket);
+
+   const scrollToBottom = () => {
+      if (commentsEndRef.current) {
+         commentsEndRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+         });
+      }
+   };
 
    const handleCommentClick = () => {
       if (!onProfile) {
-         setCommentModelOpen(!commentModelOpen);
+         setCommentModelOpen((prev) => !prev);
       }
    };
+
+   useEffect(() => {
+      if (commentModelOpen) {
+         setTimeout(scrollToBottom, 100);
+      }
+   }, [commentModelOpen]);
 
    const handleLike = async () => {
       try {
@@ -56,6 +74,7 @@ const Post = ({post, onProfile}) => {
          );
          dispatch(setPostData(updatedPosts));
          setComment('');
+         setTimeout(scrollToBottom, 100);
       } catch (error) {
          console.error('Error commenting:', error);
          alert('Failed to comment on post');
@@ -102,6 +121,34 @@ const Post = ({post, onProfile}) => {
          };
       }
    }, [post._id]);
+
+   useEffect(() => {
+      socket.on('postLiked', (data) => {
+         if (data.postId === post._id) {
+            const updatedPost = {...post, likes: data.likes};
+            const updatedPosts = postData.map((p) =>
+               p._id === updatedPost._id ? updatedPost : p
+            );
+            dispatch(setPostData(updatedPosts));
+         }
+      });
+
+      socket.on('commentedPost', (data) => {
+         if (data.postId === post._id) {
+            const updatedPost = {...post, comments: data.comments};
+            const updatedPosts = postData.map((p) =>
+               p._id === updatedPost._id ? updatedPost : p
+            );
+            dispatch(setPostData(updatedPosts));
+            setTimeout(scrollToBottom, 100);
+         }
+      });
+
+      return () => {
+         socket?.off('postLiked');
+         socket?.off('commentedPost');
+      };
+   }, [socket, postData, dispatch]);
 
    return (
       <div className="w-full max-w-2xl mx-auto bg-black rounded-3xl shadow-lg overflow-hidden border border-cyan-200">
@@ -207,15 +254,13 @@ const Post = ({post, onProfile}) => {
          {commentModelOpen && (
             <div className="px-6 py-4 border-t border-cyan-100 bg-black">
                <h3 className="text-cyan-400 font-semibold mb-4">Comments</h3>
-               <div className="space-y-4 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+               <div className="space-y-4 h-64 overflow-y-auto pr-2 custom-scrollbar">
                   {post?.comments?.length > 0 ? (
                      post.comments.map((comment, idx) => (
                         <div key={idx} className="flex items-start gap-3">
                            <div
                               onClick={() =>
-                                 navigate(
-                                    `/profile/${comment.author?.userName}`
-                                 )
+                                 navigate(`/profile/${comment.author?.userName}`)
                               }
                               className="w-10 h-10 rounded-full overflow-hidden border-2 border-cyan-400 shadow cursor-pointer">
                               <img
@@ -231,15 +276,14 @@ const Post = ({post, onProfile}) => {
                               <span className="font-semibold text-sm text-white block">
                                  {comment?.author?.userName}
                               </span>
-                              <p className="text-gray-200">
-                                 {comment?.message}
-                              </p>
+                              <p className="text-gray-200">{comment?.message}</p>
                            </div>
                         </div>
                      ))
                   ) : (
                      <p className="text-gray-400">No comments yet.</p>
                   )}
+                  <div ref={commentsEndRef} />
                </div>
 
                <div className="mt-4">

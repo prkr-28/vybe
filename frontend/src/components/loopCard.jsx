@@ -7,28 +7,27 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setLoopData} from '../redux/loopSlice';
 import {useNavigate} from 'react-router-dom';
 import {PiDotsThreeOutlineVerticalFill} from 'react-icons/pi';
-import './loopcard.css';
 import {IoClose} from 'react-icons/io5';
+import './loopcard.css';
 
 const LoopCard = ({loop}) => {
    const navigate = useNavigate();
    const videoRef = useRef();
-   const commentBoxRef = useRef(null);
-   const heartRef = useRef(null);
+   const commentBoxRef = useRef();
+   const dispatch = useDispatch();
+   const {loopData} = useSelector((state) => state.loop);
+   const {userData} = useSelector((state) => state.user);
+   const {socket} = useSelector((state) => state.socket);
 
    const [isPlaying, setIsPlaying] = useState(true);
    const [showComments, setShowComments] = useState(false);
    const [comment, setComment] = useState('');
-   const {loopData} = useSelector((state) => state.loop);
-   const {userData} = useSelector((state) => state.user);
-   const dispatch = useDispatch();
    const [progress, setProgress] = useState(0);
    const [showHeart, setShowHeart] = useState(false);
 
    const handleVideoClick = () => {
       const video = videoRef.current;
       if (!video) return;
-
       if (video.paused) {
          video.play();
          setIsPlaying(true);
@@ -59,18 +58,15 @@ const LoopCard = ({loop}) => {
    };
 
    const handleDoubleClick = () => {
-      if (
-         !loopData.find((l) => l._id === loop._id)?.likes.includes(userData._id)
-      ) {
+      if (!loopData.find((l) => l._id === loop._id)?.likes.includes(userData._id)) {
          handleLike();
       }
-      setTimeout(() => setShowHeart(false), 1500);
       setShowHeart(true);
+      setTimeout(() => setShowHeart(false), 1500);
    };
 
    const handleSendComment = async () => {
       if (!comment.trim()) return;
-
       try {
          const res = await axios.post(
             `${serverUrl}/api/loop/comment/${loop?._id}`,
@@ -83,19 +79,30 @@ const LoopCard = ({loop}) => {
          );
          dispatch(setLoopData(updatedLoops));
          setComment('');
-
-         // Scroll to bottom after comment
-         setTimeout(() => {
-            if (commentBoxRef.current) {
-               commentBoxRef.current.scrollTop =
-                  commentBoxRef.current.scrollHeight;
-            }
-         }, 100);
+         setTimeout(scrollToBottom, 100);
       } catch (error) {
          console.error(error);
          alert('Failed to comment on loop');
       }
    };
+
+   const scrollToBottom = () => {
+      if (commentBoxRef.current) {
+         commentBoxRef.current.scrollTop = commentBoxRef.current.scrollHeight;
+      }
+   };
+
+   useEffect(() => {
+      if (showComments) {
+         document.body.style.overflow = 'hidden';
+         setTimeout(scrollToBottom, 100);
+      } else {
+         document.body.style.overflow = 'auto';
+      }
+      return () => {
+         document.body.style.overflow = 'auto';
+      };
+   }, [showComments]);
 
    useEffect(() => {
       const observer = new IntersectionObserver(
@@ -103,9 +110,8 @@ const LoopCard = ({loop}) => {
             entries.forEach((entry) => {
                const video = videoRef.current;
                if (!video) return;
-
                if (entry.isIntersecting) {
-                  video.currentTime = 0; // Reset when in view
+                  video.currentTime = 0;
                   video.play();
                   setIsPlaying(true);
                } else {
@@ -116,31 +122,50 @@ const LoopCard = ({loop}) => {
          },
          {threshold: 0.6}
       );
-
       const currentVideo = videoRef.current;
-      if (currentVideo) {
-         observer.observe(currentVideo);
-      }
-
+      if (currentVideo) observer.observe(currentVideo);
       return () => {
-         if (currentVideo) {
-            observer.unobserve(currentVideo);
-         }
+         if (currentVideo) observer.unobserve(currentVideo);
       };
    }, []);
 
    const handleTimeUpdate = () => {
       const video = videoRef.current;
       if (!video) return;
-
       const currentTime = video.currentTime;
       const duration = video.duration;
-
       if (duration > 0) {
-         const progressPercentage = (currentTime / duration) * 100;
-         setProgress(progressPercentage);
+         setProgress((currentTime / duration) * 100);
       }
    };
+
+   useEffect(() => {
+      socket.on('loopLiked', (data) => {
+         if (data.loopId === loop._id) {
+            const updatedLoop = {...loop, likes: data.likes};
+            const updatedLoops = loopData.map((l) =>
+               l._id === updatedLoop._id ? updatedLoop : l
+            );
+            dispatch(setLoopData(updatedLoops));
+         }
+      });
+
+      socket.on('loopCommented', (data) => {
+         if (data.loopId === loop._id) {
+            const updatedLoop = {...loop, comments: data.comments};
+            const updatedLoops = loopData.map((l) =>
+               l._id === updatedLoop._id ? updatedLoop : l
+            );
+            dispatch(setLoopData(updatedLoops));
+            setTimeout(scrollToBottom, 100);
+         }
+      });
+
+      return () => {
+         socket?.off('loopLiked');
+         socket?.off('loopCommented');
+      };
+   }, [socket, loopData, dispatch]);
 
    return (
       <div className="relative w-full lg:w-[480px] h-[100vh] flex items-center justify-center bg-black overflow-hidden">
@@ -157,9 +182,7 @@ const LoopCard = ({loop}) => {
             onTimeUpdate={handleTimeUpdate}
          />
 
-         {showHeart && (
-            <FaHeart className="heart-animation text-8xl text-red-600" />
-         )}
+         {showHeart && <FaHeart className="heart-animation text-8xl text-red-600" />}
 
          {/* Overlay */}
          <div className="absolute bottom-0 left-0 p-4 w-full flex flex-col justify-end bg-gradient-to-t from-black/70 to-transparent">
@@ -168,16 +191,12 @@ const LoopCard = ({loop}) => {
                className="text-white font-semibold text-lg cursor-pointer">
                @{loop.author?.userName || 'user'}
             </p>
-            {loop.caption && (
-               <p className="text-white text-md mt-1">{loop.caption}</p>
-            )}
+            {loop.caption && <p className="text-white text-md mt-1">{loop.caption}</p>}
          </div>
 
          {/* Actions */}
          <div className="absolute right-4 bottom-20 flex flex-col items-center gap-6">
-            <button
-               onClick={handleLike}
-               className="flex flex-col items-center text-white">
+            <button onClick={handleLike} className="flex flex-col items-center text-white">
                {loop.likes?.includes(userData?._id) ? (
                   <FaHeart className="text-2xl text-red-500 hover:scale-110 transition-transform" />
                ) : (
@@ -190,9 +209,7 @@ const LoopCard = ({loop}) => {
                onClick={() => setShowComments(!showComments)}
                className="flex flex-col items-center text-white">
                <MdOutlineComment className="text-2xl hover:scale-110 transition-transform" />
-               <span className="text-xs mt-1">
-                  {loop.comments?.length || 0}
-               </span>
+               <span className="text-xs mt-1">{loop.comments?.length || 0}</span>
             </button>
 
             <button className="flex flex-col items-center cursor-pointer">
@@ -209,15 +226,12 @@ const LoopCard = ({loop}) => {
          </div>
 
          {/* Comments Modal */}
-
          <div
             className={`absolute bottom-0 left-0 w-full bg-black bg-opacity-90 rounded-t-4xl p-4 max-h-[60%] flex flex-col transition-transform duration-500 ease-in-out ${
                showComments ? 'translate-y-0' : 'translate-y-full'
             }`}>
             <div className="flex items-center justify-between mb-3 border-b border-gray-800 pb-2">
-               <h3 className="text-white text-xl font-semibold mb-2">
-                  Comments
-               </h3>
+               <h3 className="text-white text-xl font-semibold mb-2">Comments</h3>
                <IoClose
                   className="text-white text-[28px] cursor-pointer hover:scale-120 transition-transform"
                   onClick={() => setShowComments(false)}
@@ -225,9 +239,7 @@ const LoopCard = ({loop}) => {
             </div>
 
             {/* Comment List */}
-            <div
-               className="flex-1 overflow-y-auto mb-3 px-4 gap-4 scrollbar-hide"
-               ref={commentBoxRef}>
+            <div className="flex-1 overflow-y-auto mb-3 px-4 gap-4 scrollbar-hide" ref={commentBoxRef}>
                {loop.comments?.length > 0 ? (
                   loop.comments.map((comment, idx) => (
                      <div key={idx} className="mb-2">
