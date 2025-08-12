@@ -24,8 +24,11 @@ const FeedHome = ({ postData }) => {
         <div className="logo font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent text-[22px]">
           VYBE
         </div>
-        <div onClick={() => navigate("/notifications")} className="Relative flex items-center gap-3">
-          <FaRegHeart className="text-white text-2xl cursor-pointer" />
+        <div className="Relative flex items-center gap-3">
+          <FaRegHeart
+            onClick={() => navigate("/notifications")}
+            className="text-white text-2xl cursor-pointer"
+          />
           {notifications.length > 0 &&
             notifications.some((noti) => !noti.isRead) && (
               <span className="absolute top-[12px] right-[45px] bg-red-500 text-white text-xs rounded-full px-1">

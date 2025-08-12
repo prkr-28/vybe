@@ -8,7 +8,7 @@ import {
   searchUsers,
   updateUserProfile,
   getAllNotifications,
-  markNotificationAsRead,
+  markAllNotificationsAsRead,
 } from "../controller/user.js";
 import upload from "../middlewares/multer.js";
 
@@ -25,10 +25,6 @@ userRouter.get("/getProfile/:userName", isAuthenticated, getUserProfileById);
 userRouter.post("/follow/:userId", isAuthenticated, FollowUser);
 userRouter.get("/getSearchedUsers", isAuthenticated, searchUsers);
 userRouter.get("/getAllNotifications", isAuthenticated, getAllNotifications);
-userRouter.post(
-  "/markNotificationAsRead",
-  isAuthenticated,
-  markNotificationAsRead
-);
+userRouter.put("/mark-all-read", isAuthenticated, markAllNotificationsAsRead);
 
 export default userRouter;

@@ -1,6 +1,7 @@
 import uploadOnCloudinary from "../middlewares/cloudinary.js";
 import User from "../models/user.js";
 import Notification from "../models/notification.js";
+import { getSocketId, io } from "../socket.js";
 
 export const getCurrentUser = async (req, res) => {
   try {
@@ -194,6 +195,7 @@ export const searchUsers = async (req, res) => {
 export const getAllNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find({ receiver: req.userId })
+      .sort({ createdAt: -1 })
       .populate("sender", "userName name profileImage")
       .populate("receiver", "userName name profileImage")
       .populate("post");
@@ -206,21 +208,17 @@ export const getAllNotifications = async (req, res) => {
   }
 };
 
-export const markNotificationAsRead = async (req, res) => {
+export const markAllNotificationsAsRead = async (req, res) => {
   try {
-    const { notificationId } = req.params;
-    const notification = await Notification.findById(notificationId);
-    if (!notification) {
-      return res.status(404).json({ message: "Notification not found" });
-    }
+    await Notification.updateMany(
+      { receiver: req.userId, isRead: false },
+      { $set: { isRead: true } }
+    );
 
-    notification.read = true;
-    await notification.save();
-
-    res.status(200).json(notification);
+    res.status(200).json({ message: "All notifications marked as read" });
   } catch (error) {
     res.status(500).json({
-      message: "Error marking notification as read",
+      message: "Error marking notifications as read",
       error: error.message,
     });
   }

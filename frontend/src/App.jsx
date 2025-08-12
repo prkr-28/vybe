@@ -24,6 +24,7 @@ import { setOnlineUsers, setSocket } from "./redux/socketSlice";
 import Searchpage from "./pages/searchpage";
 import useGetAllNotifications from "./hooks/getAllNotifications";
 import Notifications from "./pages/notifications";
+import { addNotification } from "./redux/userSlice";
 
 const App = () => {
   useGetCurrentUser();
@@ -36,6 +37,7 @@ const App = () => {
 
   const { userData } = useSelector((state) => state.user);
   const { socket } = useSelector((state) => state.socket);
+  const { notifications } = useSelector((state) => state.user);
   const { onlineUsers } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
 
@@ -66,6 +68,20 @@ const App = () => {
       }
     }
   }, [userData]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("newNotification", (notification) => {
+        dispatch(addNotification(notification));
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("newNotification");
+      }
+    };
+  }, [socket, dispatch]);
 
   return (
     <Routes>

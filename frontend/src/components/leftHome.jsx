@@ -11,7 +11,7 @@ import FollowUser from "./followButton";
 const LeftHome = () => {
   const { userData } = useSelector((state) => state.user);
   const { suggestedUsers } = useSelector((state) => state.user);
-  const { notifications } = useSelector((state) => state.user);
+  const { notifications = [] } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleLogOut = async () => {
@@ -25,6 +25,8 @@ const LeftHome = () => {
     }
   };
 
+  const unreadCount = notifications.filter((n) => n.isRead === false).length;
+
   const navigate = useNavigate();
 
   return (
@@ -35,12 +37,11 @@ const LeftHome = () => {
         </div>
         <div onClick={() => navigate("/notifications")} className="relative">
           <FaRegHeart className="text-white text-2xl cursor-pointer" />
-          {notifications.length > 0 &&
-            notifications.some((noti) => !noti.isRead) && (
-              <span className="absolute top-[-8px] right-[-5px] bg-red-500 text-white text-xs rounded-full px-1">
-                {notifications.filter((noti) => !noti.read).length}
-              </span>
-            )}
+          {unreadCount > 0 && (
+            <span className="absolute top-[-8px] right-[-5px] bg-red-500 text-white text-xs rounded-full px-1">
+              {unreadCount}
+            </span>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-2 justify-between px-3 border-b-1 border-gray-800 pb-3">

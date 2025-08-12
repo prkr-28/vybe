@@ -27,7 +27,23 @@ const userSlice = createSlice({
       state.searchedUsers = action.payload;
     },
     setNotificationData: (state, action) => {
-      state.notifications = action.payload;
+      state.notifications = action.payload || [];
+    },
+    addNotification: (state, action) => {
+      const exists = state.notifications.some(
+        (n) => n._id === action.payload._id
+      );
+      if (!exists) {
+        // insert at the front to keep newest first
+        state.notifications = [action.payload, ...state.notifications];
+      }
+    },
+
+    markAllNotificationsRead: (state) => {
+      state.notifications = state.notifications.map((n) => ({
+        ...n,
+        isRead: true,
+      }));
     },
     toggleFollow: (state, action) => {
       const userId = action.payload;
@@ -48,5 +64,8 @@ export const {
   setSearchedUsers,
   toggleFollow,
   setNotificationData,
+  addNotification,
+  markAllNotificationsRead,
 } = userSlice.actions;
+
 export default userSlice.reducer;

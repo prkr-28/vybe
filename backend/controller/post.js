@@ -73,36 +73,54 @@ export const likePost = async (req, res) => {
     const alreadyLiked = post.likes.includes(userId);
 
     if (alreadyLiked) {
+      // Unlike
       post.likes.pull(userId);
+
+      // Optional: Remove notification when unliked
+      await Notification.findOneAndDelete({
+        sender: userId,
+        receiver: post.author._id,
+        type: "like",
+        post: post._id,
+      });
     } else {
       post.likes.push(userId);
 
       // Send notification only if the user liking is not the author
       if (String(post.author._id) !== String(userId)) {
-        const notification = new Notification({
+        // Check if notification already exists
+        const existingNotification = await Notification.findOne({
           sender: userId,
           receiver: post.author._id,
           type: "like",
-          message: `has liked your post`,
           post: post._id,
         });
 
-        await notification.save();
+        if (!existingNotification) {
+          const notification = new Notification({
+            sender: userId,
+            receiver: post.author._id,
+            type: "like",
+            message: `has liked your post`,
+            post: post._id,
+          });
 
-        const populatedNotification = await Notification.findById(
-          notification._id
-        )
-          .populate("sender", "userName name profileImage")
-          .populate("receiver", "userName name profileImage")
-          .populate("post");
+          await notification.save();
 
-        // Emit to specific socket user
-        const receiverSocketId = getSocketId(post.author._id);
-        if (receiverSocketId) {
-          io.to(receiverSocketId).emit(
-            "newNotification",
-            populatedNotification
-          );
+          const populatedNotification = await Notification.findById(
+            notification._id
+          )
+            .populate("sender", "userName name profileImage")
+            .populate("receiver", "userName name profileImage")
+            .populate("post");
+
+          const receiverSocketId = getSocketId(post.author._id);
+          if (receiverSocketId) {
+            io.to(receiverSocketId).emit(
+              "newNotification",
+              populatedNotification
+            );
+          }
         }
       }
     }
