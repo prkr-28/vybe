@@ -19,15 +19,12 @@ const __dirname = path.resolve();
 
 app.use(
   cors({
-    origin: "https://vybe-ten.vercel.app/",
+    origin: "https://vybe-ten.vercel.app",
     credentials: true,
   })
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use("/", (req, res) => {
-  res.send("Backend is live!");
-});
 
 app.use("/api/auth", authrouter);
 app.use("/api/user", userRouter);
@@ -35,6 +32,10 @@ app.use("/api/post", postRouter);
 app.use("/api/loop", loopRouter);
 app.use("/api/story", storyRouter);
 app.use("/api/message", messageRouter);
+
+app.get("/", (req, res) => {
+  res.send("Backend is live!");
+});
 
 server.listen(PORT, () => {
   connectDB();
