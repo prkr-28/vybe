@@ -19,7 +19,7 @@ const __dirname = path.resolve();
 
 app.use(
   cors({
-    origin: "https://vybe-ten.vercel.app",
+    origin: "https://vybe-one.vercel.app",
     credentials: true,
   })
 );
