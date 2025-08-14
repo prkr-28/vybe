@@ -4,7 +4,7 @@ import Signup from "./pages/signup";
 import Signin from "./pages/signin";
 import ForgotPassword from "./pages/forgotpassword";
 import Home from "./pages/home";
-export const serverUrl = "http://localhost:8000";
+export const serverUrl = "https://vybe-k318.onrender.com";
 import { useDispatch, useSelector } from "react-redux";
 import useGetCurrentUser from "./hooks/getCurrentUser";
 import useGetSuggestedUsers from "./hooks/getSuggestedUsers";
