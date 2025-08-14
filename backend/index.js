@@ -26,7 +26,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
+app.use("/", (req, res) => {
   res.send("Backend is live!");
 });
 
