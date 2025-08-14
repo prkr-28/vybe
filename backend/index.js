@@ -25,6 +25,9 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.use("/", (req, res) => {
+  res.send("Backend is live!");
+});
 
 app.use("/api/auth", authrouter);
 app.use("/api/user", userRouter);
