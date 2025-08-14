@@ -33,11 +33,6 @@ app.use("/api/loop", loopRouter);
 app.use("/api/story", storyRouter);
 app.use("/api/message", messageRouter);
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")));
-app.get("/*", (_, res) => {
-  res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-});
-
 server.listen(PORT, () => {
   connectDB();
   console.log(`Server is running on http://localhost:${PORT}`);
