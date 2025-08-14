@@ -8,7 +8,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://vybe-one.vercel.app",
     methods: ["GET", "POST"],
   },
 });
@@ -16,10 +16,9 @@ const io = new Server(server, {
 const userSocketMap = {};
 const onlineUsers = [];
 
-export const getSocketId= (userId) => 
-  {
-    return userSocketMap[userId] || null;
-  }  
+export const getSocketId = (userId) => {
+  return userSocketMap[userId] || null;
+};
 io.on("connection", async (socket) => {
   const userId = socket.handshake.query.userId;
   if (!userId) {
