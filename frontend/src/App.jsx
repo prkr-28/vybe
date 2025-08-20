@@ -25,6 +25,8 @@ import Searchpage from "./pages/searchpage";
 import useGetAllNotifications from "./hooks/getAllNotifications";
 import Notifications from "./pages/notifications";
 import { addNotification } from "./redux/userSlice";
+import { AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 const App = () => {
   useGetCurrentUser();
@@ -40,6 +42,7 @@ const App = () => {
   const { notifications } = useSelector((state) => state.user);
   const { onlineUsers } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
+  const location = useLocation();
 
   useEffect(() => {
     if (userData) {
@@ -84,60 +87,62 @@ const App = () => {
   }, [socket, dispatch]);
 
   return (
-    <Routes>
-      <Route
-        path="/signup"
-        element={!userData ? <Signup /> : <Navigate to="/" />}
-      />
-      <Route
-        path="/signin"
-        element={!userData ? <Signin /> : <Navigate to="/" />}
-      />
-      <Route
-        path="/forgotpassword"
-        element={!userData ? <ForgotPassword /> : <Navigate to="/" />}
-      />
-      <Route
-        path="/"
-        element={userData ? <Home /> : <Navigate to="/signin" />}
-      />
-      <Route
-        path="/profile/:userName"
-        element={userData ? <Profile /> : <Navigate to="/signin" />}
-      />
-      <Route
-        path="/editprofile"
-        element={userData ? <EditProfilePage /> : <Navigate to="/signin" />}
-      />
-      <Route
-        path="/upload"
-        element={userData ? <Upload /> : <Navigate to="/signin" />}
-      />
-      <Route
-        path="/loop"
-        element={userData ? <Loop /> : <Navigate to="/signin" />}
-      />
-      <Route
-        path="/story/:userName"
-        element={userData ? <Story /> : <Navigate to="/signin" />}
-      />
-      <Route
-        path="/messages"
-        element={userData ? <Message /> : <Navigate to="/signin" />}
-      />
-      <Route
-        path="/messageArea"
-        element={userData ? <MessageArea /> : <Navigate to="/signin" />}
-      />
-      <Route
-        path="/search"
-        element={userData ? <Searchpage /> : <Navigate to="/signin" />}
-      />
-      <Route
-        path="/notifications"
-        element={userData ? <Notifications /> : <Navigate to="/signin" />}
-      />
-    </Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route
+          path="/signup"
+          element={!userData ? <Signup /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/signin"
+          element={!userData ? <Signin /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/forgotpassword"
+          element={!userData ? <ForgotPassword /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/"
+          element={userData ? <Home /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/profile/:userName"
+          element={userData ? <Profile /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/editprofile"
+          element={userData ? <EditProfilePage /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/upload"
+          element={userData ? <Upload /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/loop"
+          element={userData ? <Loop /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/story/:userName"
+          element={userData ? <Story /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/messages"
+          element={userData ? <Message /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/messageArea"
+          element={userData ? <MessageArea /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/search"
+          element={userData ? <Searchpage /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/notifications"
+          element={userData ? <Notifications /> : <Navigate to="/signin" />}
+        />
+      </Routes>
+    </AnimatePresence>
   );
 };
 
