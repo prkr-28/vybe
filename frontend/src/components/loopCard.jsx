@@ -197,7 +197,7 @@ const LoopCard = ({ loop }) => {
           @{loop.author?.userName || "user"}
         </p>
         {loop.caption && (
-          <p className="text-white text-md mt-1">{loop.caption}</p>
+          <p className="text-gray-400 text-md mt-1">{loop.caption}</p>
         )}
       </div>
 
