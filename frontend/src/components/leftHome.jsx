@@ -78,7 +78,7 @@ const LeftHome = () => {
 
       <div className="w-full flex flex-col gap-4 px-3 pt-3">
         <h1 className="text-white text-[18px]">Suggested Users</h1>
-        <div className="flex flex-col gap-4 overflow-y-auto max-h-[75vh]">
+        <div className="flex flex-col gap-4 overflow-y-auto max-h-[72vh]">
           {suggestedUsers?.length > 0 ? (
             suggestedUsers.map((user) => (
               <div
